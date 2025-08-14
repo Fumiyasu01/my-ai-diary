@@ -1,46 +1,116 @@
-# Getting Started with Create React App
+# My AI Diary - AIとの会話が日記になるアプリ
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## 概要
+カスタマイズ可能なAIエージェントとの日常会話を自動的に日記として記録・整理するWebアプリケーション。
 
-## Available Scripts
+## コンセプト
+「AIとの日常会話が、自動的に自分だけの日記になるアプリ」
 
-In the project directory, you can run:
+### 解決する課題
+- AIモデルのアップデートによる性格・口調の変化への不満
+- 日記を書く習慣の継続が難しい
+- AIとの会話履歴が散逸してしまう
+- 自分好みのAI相談相手が欲しい
 
-### `npm start`
+## 主要機能
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+### ✅ 実装済み
+- **基本UIレイアウト**
+  - モバイルファーストのレスポンシブデザイン
+  - チャット/日記のタブ切り替え
+  - WhatsApp/LINE風のメッセージUI
+  
+- **AIエージェント設定**
+  - 自由記述での性格・話し方のカスタマイズ
+  - 設定モーダルUI
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+### 🚧 開発中
+- **API連携**
+  - OpenAI/Claude APIとの接続
+  - カスタムプロンプトの反映
 
-### `npm test`
+- **データ永続化**
+  - IndexedDBによるローカル保存
+  - 会話履歴の保持
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### 📋 今後実装予定
+- **日記自動生成**
+  - 会話内容の自動要約
+  - 感情タグの自動付与
+  - キーワード抽出
 
-### `npm run build`
+- **追加機能**
+  - 音声入力（Web Speech API）
+  - カレンダービュー
+  - 検索機能
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## 技術スタック
+- **フロントエンド**: React 19.1.1 (TypeScript)
+- **スタイリング**: Tailwind CSS 3.4
+- **データ保存**: IndexedDB（予定）
+- **AI連携**: OpenAI/Claude API（予定）
+- **開発環境**: Create React App
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## 開発環境のセットアップ
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+```bash
+# 依存関係のインストール
+npm install
 
-### `npm run eject`
+# 開発サーバーの起動（ポート3001）
+PORT=3001 npm start
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+# ビルド
+npm run build
+```
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## プロジェクト構造
+```
+src/
+├── components/
+│   ├── Header.tsx          # ヘッダーコンポーネント
+│   ├── ChatView.tsx        # チャット画面
+│   ├── MessageList.tsx     # メッセージリスト
+│   ├── MessageInput.tsx    # メッセージ入力
+│   ├── Message.tsx         # 個別メッセージ
+│   ├── DiaryView.tsx       # 日記表示画面
+│   └── AgentSettings.tsx   # AI設定モーダル
+├── App.tsx                 # メインアプリケーション
+└── index.css              # Tailwind CSS設定
+```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+## データ構造
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+### 会話データ
+```typescript
+{
+  id: string,
+  date: string,
+  conversations: [{
+    role: 'user' | 'assistant',
+    content: string,
+    timestamp: string
+  }],
+  diary: {
+    summary: string,
+    emotion: string[],
+    keywords: string[]
+  }
+}
+```
 
-## Learn More
+### AIエージェント設定
+```typescript
+{
+  agentName: string,
+  personality: string,
+  createdAt: string,
+  lastUpdated: string
+}
+```
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+## 開発状況
+- 2025-08-14: プロジェクト開始、基本UI実装完了
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+## ライセンス
+Private Project
