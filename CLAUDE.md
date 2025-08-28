@@ -124,12 +124,71 @@ npx tsc --noEmit
 
 ## 開発者メモ
 
-### 2025-08-14
-- プロジェクト開始
+### 2025-08-28 開発完了
+- プロジェクト開始・完成
 - 基本UI実装完了
 - Tailwind CSS v4→v3への変更（CRA互換性のため）
 - ポート3001で開発環境構築
+- IndexedDB実装（データ永続化）
+- OpenAI API連携（GPT-3.5-turbo）
+- 日記自動生成機能実装
+- カレンダービュー実装
+- Vercelデプロイ完了
+
+## 現在のステータス
+- **本番環境**: https://my-ai-diary-ten.vercel.app/
+- **GitHub**: https://github.com/Fumiyasu01/my-ai-diary
+- **状態**: ✅ 本番稼働中
+
+## 次回開発時の必須確認事項
+
+### 1. 環境設定
+```bash
+# 開発開始前に必ず実行
+cd /Users/fumiyasu/develop/my-ai-diary
+PORT=3001 npm start  # ポート3001必須
+```
+
+### 2. 重要な制約
+- **Tailwind CSS**: v3.4を維持（v4は使用不可）
+- **React**: v19.1.1で動作確認済み
+- **ポート**: 3001固定（3000は他アプリ使用中）
+
+### 3. データ確認
+```javascript
+// ブラウザコンソールでIndexedDB確認
+const db = await openDB('my-ai-diary', 1);
+const conversations = await db.getAll('conversations');
+console.log(conversations);
+```
+
+### 4. コンポーネント構造
+```
+src/
+├── components/       # UIコンポーネント
+├── services/        # API連携・DB操作
+├── hooks/          # カスタムフック
+└── types/          # TypeScript型定義
+```
+
+### 5. Git操作
+```bash
+# 変更をデプロイ
+git add .
+git commit -m "変更内容"
+git push origin main  # Vercel自動デプロイ
+```
+
+## トラブルシューティング早見表
+
+| 問題 | 解決方法 |
+|------|---------|
+| PostCSSエラー | Tailwind CSS v3を再インストール |
+| ポート使用中 | PORT=3001で起動 |
+| 設定が反映されない | DebugInfoで確認、useEffect追加 |
+| データが消えた | IndexedDBを確認 |
+| APIエラー | APIキーの有効性確認 |
 
 ---
 
-このドキュメントは開発の進行に合わせて更新していきます。
+詳細は DEVELOPMENT_LOG.md を参照してください。
