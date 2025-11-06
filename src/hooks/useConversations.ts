@@ -176,7 +176,7 @@ export const useConversations = (): UseConversationsReturn => {
   }, [currentConversation]);
 
   /**
-   * メッセージを追加
+   * メッセージを追加または更新
    */
   const addMessage = useCallback(async (message: MessageData) => {
     if (!currentConversation) {
@@ -189,18 +189,33 @@ export const useConversations = (): UseConversationsReturn => {
       };
       await db.saveConversation(updated);
       setCurrentConversation(updated);
+      setConversations(prev => [updated, ...prev]);
       return;
+    }
+
+    // 既存のメッセージを確認
+    const existingIndex = currentConversation.conversations.findIndex(m => m.id === message.id);
+
+    let newConversations: MessageData[];
+    if (existingIndex >= 0) {
+      // 既存メッセージを更新
+      newConversations = currentConversation.conversations.map((m, i) =>
+        i === existingIndex ? message : m
+      );
+    } else {
+      // 新規メッセージを追加
+      newConversations = [...currentConversation.conversations, message];
     }
 
     const updated: ConversationData = {
       ...currentConversation,
-      conversations: [...currentConversation.conversations, message],
+      conversations: newConversations,
       updatedAt: new Date().toISOString(),
       metadata: {
         wordCount:
           (currentConversation.metadata?.wordCount || 0) +
           message.content.split(/\s+/).length,
-        conversationCount: currentConversation.conversations.length + 1,
+        conversationCount: newConversations.length,
         duration: 0,
       },
     };
