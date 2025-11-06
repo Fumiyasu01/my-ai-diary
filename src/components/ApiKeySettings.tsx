@@ -122,9 +122,13 @@ const ApiKeySettings: React.FC<ApiKeySettingsProps> = ({
 
           <div className="bg-yellow-50 rounded-lg p-4">
             <h3 className="text-sm font-medium text-yellow-900 mb-1">料金について</h3>
-            <p className="text-xs text-yellow-700">
+            <p className="text-xs text-yellow-700 mb-2">
               GPT-3.5-turboは1000トークンあたり約$0.002です。
               通常の使用では月額$1〜5程度で十分です。
+            </p>
+            <p className="text-xs text-yellow-700 font-medium">
+              ⚠️ 料金はあなたのOpenAIアカウントに発生します。
+              サイト運営者や他のユーザーには一切影響ありません。
             </p>
           </div>
         </div>
