@@ -4,6 +4,8 @@ import ChatView from './components/ChatView';
 import DiaryView from './components/DiaryView';
 import AgentSettings from './components/AgentSettings';
 import ApiKeySettings from './components/ApiKeySettings';
+import DataManagement from './components/DataManagement';
+import Onboarding from './components/Onboarding';
 import DebugInfo from './components/DebugInfo';
 import DiaryGenerator from './components/DiaryGenerator';
 import { useDatabase } from './hooks/useDatabase';
@@ -17,6 +19,8 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isApiKeySettingsOpen, setIsApiKeySettingsOpen] = useState(false);
+  const [isDataManagementOpen, setIsDataManagementOpen] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(false);
   const [isGeneratingDiary, setIsGeneratingDiary] = useState(false);
   const [agentName, setAgentName] = useState('AI アシスタント');
   const [agentPersonality, setAgentPersonality] = useState(
@@ -34,6 +38,9 @@ function App() {
     saveMessage,
     loadAllConversations,
     saveConversation,
+    exportData,
+    importData,
+    clearAllData,
   } = useDatabase();
 
   // Load saved settings and conversations on startup
@@ -49,6 +56,18 @@ function App() {
         if (savedSettings.apiKey) {
           setApiKey(savedSettings.apiKey);
           setOpenAIService(new OpenAIService({ apiKey: savedSettings.apiKey }));
+        } else {
+          // Show onboarding if no API key is set
+          const hasSeenOnboarding = localStorage.getItem('onboarding_completed');
+          if (!hasSeenOnboarding) {
+            setShowOnboarding(true);
+          }
+        }
+      } else {
+        // First time user - show onboarding
+        const hasSeenOnboarding = localStorage.getItem('onboarding_completed');
+        if (!hasSeenOnboarding) {
+          setShowOnboarding(true);
         }
       }
 
@@ -234,6 +253,7 @@ function App() {
         activeTab={activeTab}
         onTabChange={handleTabChange}
         onSettingsClick={handleSettingsClick}
+        onDataManagementClick={() => setIsDataManagementOpen(true)}
       />
       
       <main className="flex-1 overflow-hidden mt-[104px]">
@@ -271,7 +291,24 @@ function App() {
         onSave={handleApiKeySave}
       />
 
-      {!apiKey && (
+      <DataManagement
+        isOpen={isDataManagementOpen}
+        onClose={() => setIsDataManagementOpen(false)}
+        onExport={exportData}
+        onImport={importData}
+        onClearData={clearAllData}
+      />
+
+      <Onboarding
+        isOpen={showOnboarding}
+        onComplete={() => {
+          setShowOnboarding(false);
+          localStorage.setItem('onboarding_completed', 'true');
+        }}
+        onOpenApiKeySettings={() => setIsApiKeySettingsOpen(true)}
+      />
+
+      {!apiKey && !showOnboarding && (
         <div className="fixed bottom-4 right-4 bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded-lg shadow-lg max-w-sm">
           <p className="text-sm font-medium">APIキーが未設定です</p>
           <p className="text-xs mt-1">設定ボタンからOpenAI APIキーを設定してください</p>

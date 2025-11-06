@@ -5,13 +5,15 @@ interface HeaderProps {
   activeTab: 'chat' | 'diary';
   onTabChange: (tab: 'chat' | 'diary') => void;
   onSettingsClick: () => void;
+  onDataManagementClick: () => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ 
-  agentName, 
-  activeTab, 
-  onTabChange, 
-  onSettingsClick 
+const Header: React.FC<HeaderProps> = ({
+  agentName,
+  activeTab,
+  onTabChange,
+  onSettingsClick,
+  onDataManagementClick
 }) => {
   return (
     <header className="bg-white border-b border-gray-200 fixed top-0 left-0 right-0 z-10">
@@ -31,11 +33,13 @@ const Header: React.FC<HeaderProps> = ({
             </svg>
           </button>
           <button
+            onClick={onDataManagementClick}
             className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-            aria-label="Profile"
+            aria-label="Data Management"
+            title="データ管理"
           >
             <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" />
             </svg>
           </button>
         </div>
