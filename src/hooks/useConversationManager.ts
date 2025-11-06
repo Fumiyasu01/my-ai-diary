@@ -30,6 +30,7 @@ interface UseConversationManagerReturn {
   // Message management
   handleRegenerateMessage: () => Promise<void>;
   addMessage: (message: MessageData) => Promise<void>;
+  updateMessageContent: (messageId: string, content: string) => void;
 
   // Loading state
   isRegenerating: boolean;
@@ -49,6 +50,7 @@ export const useConversationManager = ({
     conversations,
     currentConversation,
     addMessage,
+    updateMessageContent,
     loadAllConversations: reloadConversations,
     createNewConversation,
     switchConversation,
@@ -178,6 +180,7 @@ export const useConversationManager = ({
     // Message management
     handleRegenerateMessage,
     addMessage,
+    updateMessageContent,
 
     // Loading state
     isRegenerating,

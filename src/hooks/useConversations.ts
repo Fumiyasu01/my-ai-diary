@@ -19,6 +19,7 @@ export interface UseConversationsReturn {
 
   // メッセージ管理
   addMessage: (message: MessageData) => Promise<void>;
+  updateMessageContent: (messageId: string, content: string) => void;
   deleteMessage: (messageId: string) => Promise<void>;
 
   // 検索・フィルタ
@@ -213,6 +214,27 @@ export const useConversations = (): UseConversationsReturn => {
   }, [currentConversation, createNewConversation]);
 
   /**
+   * メッセージの内容を更新（リアルタイムストリーミング用）
+   * データベースには保存せず、状態のみ更新
+   */
+  const updateMessageContent = useCallback((messageId: string, content: string) => {
+    if (!currentConversation) return;
+
+    const updated: ConversationData = {
+      ...currentConversation,
+      conversations: currentConversation.conversations.map(msg =>
+        msg.id === messageId ? { ...msg, content } : msg
+      ),
+    };
+
+    setCurrentConversation(updated);
+
+    setConversations(prev =>
+      prev.map(c => (c.id === currentConversation.id ? updated : c))
+    );
+  }, [currentConversation]);
+
+  /**
    * メッセージを削除
    */
   const deleteMessage = useCallback(async (messageId: string) => {
@@ -277,6 +299,7 @@ export const useConversations = (): UseConversationsReturn => {
     deleteConversation,
     clearCurrentConversation,
     addMessage,
+    updateMessageContent,
     deleteMessage,
     searchConversations,
     getConversationsByDateRange,

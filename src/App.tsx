@@ -64,6 +64,7 @@ function App() {
     handleSearchConversations,
     handleRegenerateMessage,
     addMessage,
+    updateMessageContent,
     isRegenerating,
   } = useConversationManager({
     openAIService,
@@ -144,35 +145,87 @@ function App() {
     setIsLoading(true);
 
     try {
-      let aiResponse: string;
+      let aiResponse = '';
 
       if (openAIService && apiKey) {
-        // Use OpenAI API
-        const systemPrompt = `あなたの名前は${agentName}です。${agentPersonality}`;
-        aiResponse = await openAIService.sendMessage(messages.concat(userMessage), systemPrompt);
+        // Enhanced system prompt for deeper insights
+        const systemPrompt = `あなたの名前は${agentName}です。${agentPersonality}
+
+あなたの役割：
+- ユーザーの感情に寄り添い、深く共感する
+- 表面的な会話ではなく、本質的な洞察を提供する
+- 適切な質問を通じて、ユーザー自身の気づきを促す
+- 日記として振り返ったときに価値のある対話を心がける
+- 心理的な安全性を保ちながら、成長につながる視点を提示する
+
+対話のポイント：
+- ユーザーの言葉の裏にある感情や意図を理解する
+- 具体的な状況や背景を丁寧に聞く
+- ポジティブな側面と課題の両方をバランスよく扱う
+- 必要に応じて、建設的なアドバイスや別の視点を提供する`;
+
+        // Create a temporary AI message for streaming
+        const aiMessageId = (Date.now() + 1).toString();
+        const streamingMessage: MessageData = {
+          id: aiMessageId,
+          role: 'assistant',
+          content: '',
+          timestamp: new Date().toISOString(),
+        };
+
+        // Add empty AI message first
+        await addMessage(streamingMessage);
+
+        // Stream the response
+        await openAIService.sendMessageStream(
+          messages.concat(userMessage),
+          systemPrompt,
+          // onChunk: Update message content as chunks arrive
+          (chunk: string) => {
+            aiResponse += chunk;
+            // Update the message content in real-time
+            updateMessageContent(aiMessageId, aiResponse);
+          },
+          // onComplete: Save final message
+          async () => {
+            const finalMessage: MessageData = {
+              id: aiMessageId,
+              role: 'assistant',
+              content: aiResponse,
+              timestamp: new Date().toISOString(),
+            };
+            await handleAsyncError(async () => {
+              await addMessage(finalMessage);
+            }, 'AI応答の保存に失敗しました');
+          },
+          // onError
+          (error: Error) => {
+            console.error('Streaming error:', error);
+            showError('AIの応答取得に失敗しました。');
+          }
+        );
       } else {
         // Fallback simulation
         aiResponse = `「${content}」について話してくれてありがとう！とても興味深いですね。もっと詳しく聞かせてください。\n\n（※APIキーが設定されていないため、シミュレーション応答です。設定画面からOpenAI APIキーを設定してください）`;
+
+        const aiMessage: MessageData = {
+          id: (Date.now() + 1).toString(),
+          role: 'assistant',
+          content: aiResponse,
+          timestamp: new Date().toISOString(),
+        };
+
+        await handleAsyncError(async () => {
+          await addMessage(aiMessage);
+        }, 'AI応答の保存に失敗しました');
       }
-
-      const aiMessage: MessageData = {
-        id: (Date.now() + 1).toString(),
-        role: 'assistant',
-        content: aiResponse,
-        timestamp: new Date().toISOString(),
-      };
-
-      // Save AI response
-      await handleAsyncError(async () => {
-        await addMessage(aiMessage);
-      }, 'AI応答の保存に失敗しました');
     } catch (error) {
       console.error('Error getting AI response:', error);
       showError('AIの応答取得に失敗しました。APIキーを確認してください。');
     } finally {
       setIsLoading(false);
     }
-  }, [openAIService, apiKey, messages, agentName, agentPersonality, addMessage, handleAsyncError, showError]);
+  }, [openAIService, apiKey, messages, agentName, agentPersonality, addMessage, updateMessageContent, handleAsyncError, showError]);
 
   const handleTabChange = (tab: 'chat' | 'diary') => {
     setActiveTab(tab);
