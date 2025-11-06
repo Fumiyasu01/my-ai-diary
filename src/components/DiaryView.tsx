@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import CalendarView from './CalendarView';
+import { parseDateString } from '../utils/date';
 
 interface DiaryEntry {
   id: string;
@@ -44,12 +45,12 @@ const DiaryView: React.FC<DiaryViewProps> = ({ entries: allEntries, selectedDate
   };
 
   const formatDate = (dateString: string): string => {
-    const date = new Date(dateString);
-    const options: Intl.DateTimeFormatOptions = { 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric', 
-      weekday: 'long' 
+    const date = parseDateString(dateString);
+    const options: Intl.DateTimeFormatOptions = {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      weekday: 'long'
     };
     return date.toLocaleDateString('ja-JP', options);
   };

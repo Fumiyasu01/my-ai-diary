@@ -10,9 +10,10 @@ interface MessageData {
 
 interface MessageListProps {
   messages: MessageData[];
+  onRegenerateMessage?: () => void;
 }
 
-const MessageList: React.FC<MessageListProps> = ({ messages }) => {
+const MessageList: React.FC<MessageListProps> = ({ messages, onRegenerateMessage }) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -38,14 +39,21 @@ const MessageList: React.FC<MessageListProps> = ({ messages }) => {
         </div>
       ) : (
         <>
-          {messages.map((message) => (
-            <Message
-              key={message.id}
-              role={message.role}
-              content={message.content}
-              timestamp={message.timestamp}
-            />
-          ))}
+          {messages.map((message, index) => {
+            // Only allow regeneration for the last assistant message
+            const isLastMessage = index === messages.length - 1;
+            const canRegenerate = isLastMessage && message.role === 'assistant' && onRegenerateMessage;
+
+            return (
+              <Message
+                key={message.id}
+                role={message.role}
+                content={message.content}
+                timestamp={message.timestamp}
+                onRegenerate={canRegenerate ? onRegenerateMessage : undefined}
+              />
+            );
+          })}
           <div ref={messagesEndRef} />
         </>
       )}

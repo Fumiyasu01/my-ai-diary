@@ -1,11 +1,13 @@
 import React, { useState, useRef, KeyboardEvent } from 'react';
+import VoiceInput from './chat/VoiceInput';
 
 interface MessageInputProps {
   onSendMessage: (message: string) => void;
   disabled?: boolean;
+  onError?: (error: string) => void;
 }
 
-const MessageInput: React.FC<MessageInputProps> = ({ onSendMessage, disabled = false }) => {
+const MessageInput: React.FC<MessageInputProps> = ({ onSendMessage, disabled = false, onError }) => {
   const [message, setMessage] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -28,7 +30,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ onSendMessage, disabled = f
 
   const handleTextareaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setMessage(e.target.value);
-    
+
     // Auto-resize textarea
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
@@ -36,23 +38,28 @@ const MessageInput: React.FC<MessageInputProps> = ({ onSendMessage, disabled = f
     }
   };
 
-  const handleVoiceInput = () => {
-    // 音声入力機能は後で実装
-    console.log('Voice input clicked');
+  const handleVoiceTranscript = (transcript: string) => {
+    setMessage((prev) => prev + transcript);
+    if (textareaRef.current) {
+      textareaRef.current.focus();
+    }
+  };
+
+  const handleVoiceError = (error: string) => {
+    if (onError) {
+      onError(error);
+    } else {
+      console.error('Voice input error:', error);
+    }
   };
 
   return (
     <div className="border-t border-gray-200 bg-white px-4 py-3">
       <div className="flex items-end gap-2">
-        <button
-          onClick={handleVoiceInput}
-          className="p-2 hover:bg-gray-100 rounded-full transition-colors flex-shrink-0"
-          aria-label="Voice input"
-        >
-          <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
-          </svg>
-        </button>
+        <VoiceInput
+          onTranscript={handleVoiceTranscript}
+          onError={handleVoiceError}
+        />
         
         <div className="flex-1 relative">
           <textarea

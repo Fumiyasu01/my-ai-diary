@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { MessageData } from '../types';
 
 interface DiaryGeneratorProps {
@@ -14,8 +14,6 @@ const DiaryGenerator: React.FC<DiaryGeneratorProps> = ({
   isGenerating,
   hasApiKey,
 }) => {
-  const [showPreview, setShowPreview] = useState(false);
-
   const canGenerate = messages.length >= 4 && hasApiKey; // 最低4つの会話が必要
 
   return (

@@ -5,16 +5,21 @@ export interface MessageData {
   timestamp: string;
 }
 
+export interface ConversationMetadata {
+  wordCount: number;
+  conversationCount: number;
+  duration: number;
+}
+
 export interface ConversationData {
   id: string;
   date: string;
+  title?: string;                    // 会話のタイトル（ユーザーが設定可能）
   conversations: MessageData[];
   diary?: DiaryData;
-  metadata?: {
-    wordCount: number;
-    conversationCount: number;
-    duration: number;
-  };
+  metadata?: ConversationMetadata;
+  createdAt: string;                 // 作成日時
+  updatedAt: string;                 // 最終更新日時
 }
 
 export interface DiaryData {

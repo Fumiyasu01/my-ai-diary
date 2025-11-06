@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { DiaryEntry } from '../types';
+import { getLocalDateString } from '../utils/date';
 
 interface CalendarViewProps {
   entries: DiaryEntry[];
@@ -84,7 +85,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({
   };
 
   const formatDate = (date: Date): string => {
-    return date.toISOString().split('T')[0];
+    return getLocalDateString(date);
   };
 
   const isToday = (date: Date): boolean => {

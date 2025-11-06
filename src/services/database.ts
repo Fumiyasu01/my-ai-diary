@@ -1,5 +1,6 @@
 import { openDB, DBSchema, IDBPDatabase } from 'idb';
 import { ConversationData, AgentSettings } from '../types';
+import { getTodayString } from '../utils/date';
 
 interface MyAIDiaryDB extends DBSchema {
   conversations: {
@@ -68,13 +69,13 @@ class DatabaseService {
 
   // Today's conversation methods
   async getTodayConversation(): Promise<ConversationData | null> {
-    const today = new Date().toISOString().split('T')[0];
+    const today = getTodayString();
     const conversations = await this.getConversationsByDate(today);
     return conversations[0] || null;
   }
 
   async saveTodayConversation(conversation: ConversationData): Promise<void> {
-    const today = new Date().toISOString().split('T')[0];
+    const today = getTodayString();
     conversation.date = today;
     await this.saveConversation(conversation);
   }

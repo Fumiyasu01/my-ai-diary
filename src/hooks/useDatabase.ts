@@ -1,6 +1,13 @@
 import { useState, useEffect, useCallback } from 'react';
 import { db } from '../services/database';
 import { ConversationData, AgentSettings, MessageData } from '../types';
+import {
+  exportDiariesAsMarkdown,
+  exportDiariesAsHTML,
+  generatePDFReadyHTML,
+  downloadFile,
+  openHTMLInNewWindow,
+} from '../services/exportService';
 
 export const useDatabase = () => {
   const [isInitialized, setIsInitialized] = useState(false);
@@ -58,7 +65,8 @@ export const useDatabase = () => {
   const saveMessage = useCallback(async (message: MessageData): Promise<void> => {
     try {
       let conversation = await db.getTodayConversation();
-      
+      const now = new Date().toISOString();
+
       if (!conversation) {
         // Create new conversation for today
         const today = new Date().toISOString().split('T')[0];
@@ -66,21 +74,24 @@ export const useDatabase = () => {
           id: `conv-${today}-${Date.now()}`,
           date: today,
           conversations: [],
+          createdAt: now,
+          updatedAt: now,
         };
       }
 
       // Add message to conversation
       conversation.conversations.push(message);
-      
-      // Update metadata
+
+      // Update metadata and timestamps
       conversation.metadata = {
         wordCount: conversation.conversations.reduce(
-          (sum, msg) => sum + msg.content.split(' ').length, 
+          (sum, msg) => sum + msg.content.split(/\s+/).length,
           0
         ),
         conversationCount: conversation.conversations.length,
         duration: 0, // Will be calculated based on first and last message timestamps
       };
+      conversation.updatedAt = now;
 
       // Save updated conversation
       await db.saveTodayConversation(conversation);
@@ -155,6 +166,44 @@ export const useDatabase = () => {
     }
   }, []);
 
+  // Export diaries as Markdown
+  const exportDiariesMarkdown = useCallback(async (agentName?: string): Promise<void> => {
+    try {
+      const conversations = await db.getAllConversations();
+      const markdown = exportDiariesAsMarkdown(conversations);
+      const filename = `my-ai-diary-${new Date().toISOString().split('T')[0]}.md`;
+      downloadFile(markdown, filename, 'text/markdown');
+    } catch (err) {
+      console.error('Failed to export diaries as Markdown:', err);
+      throw err;
+    }
+  }, []);
+
+  // Export diaries as HTML
+  const exportDiariesHTML = useCallback(async (agentName?: string): Promise<void> => {
+    try {
+      const conversations = await db.getAllConversations();
+      const html = exportDiariesAsHTML(conversations, agentName);
+      const filename = `my-ai-diary-${new Date().toISOString().split('T')[0]}.html`;
+      downloadFile(html, filename, 'text/html');
+    } catch (err) {
+      console.error('Failed to export diaries as HTML:', err);
+      throw err;
+    }
+  }, []);
+
+  // Export diaries as PDF (opens print dialog)
+  const exportDiariesPDF = useCallback(async (agentName?: string): Promise<void> => {
+    try {
+      const conversations = await db.getAllConversations();
+      const html = generatePDFReadyHTML(conversations, agentName);
+      openHTMLInNewWindow(html);
+    } catch (err) {
+      console.error('Failed to export diaries as PDF:', err);
+      throw err;
+    }
+  }, []);
+
   return {
     isInitialized,
     loading,
@@ -168,5 +217,8 @@ export const useDatabase = () => {
     exportData,
     importData,
     clearAllData,
+    exportDiariesMarkdown,
+    exportDiariesHTML,
+    exportDiariesPDF,
   };
 };

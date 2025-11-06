@@ -183,4 +183,21 @@ indexedDB.deleteDatabase('my-ai-diary')
 - デプロイURL: https://my-ai-diary-ten.vercel.app/
 
 ---
-最終更新: 2025年8月28日
+
+## 追記情報
+
+### 2025年10月18日
+- v2.0開発計画策定完了
+- 市場調査・競合分析完了
+- 技術スタック決定: Next.js 15 + Supabase + Stripe
+- 移植計画書作成: MIGRATION_ASSETS.md
+- 完全な開発計画書作成: NEW_PROJECT_PLAN.md
+
+### 2025年11月6日 - 現在の状態
+- **v1.0本番環境**: ✅ 継続稼働中（84日間）
+- **アクセス**: https://my-ai-diary-ten.vercel.app/
+- **安定性**: 問題なく動作中
+- **次期開発**: v2.0計画完了、開発着手待ち
+
+---
+最終更新: 2025年11月6日

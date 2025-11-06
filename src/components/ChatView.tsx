@@ -13,12 +13,23 @@ interface ChatViewProps {
   messages: MessageData[];
   onSendMessage: (message: string) => void;
   isLoading?: boolean;
+  onRegenerateMessage?: () => void;
+  onError?: (error: string) => void;
 }
 
-const ChatView: React.FC<ChatViewProps> = ({ messages, onSendMessage, isLoading = false }) => {
+const ChatView: React.FC<ChatViewProps> = ({
+  messages,
+  onSendMessage,
+  isLoading = false,
+  onRegenerateMessage,
+  onError,
+}) => {
   return (
     <div className="flex flex-col flex-1 bg-gray-50">
-      <MessageList messages={messages} />
+      <MessageList
+        messages={messages}
+        onRegenerateMessage={onRegenerateMessage}
+      />
       
       {isLoading && (
         <div className="px-4 py-2 bg-white border-t border-gray-100">
@@ -32,8 +43,13 @@ const ChatView: React.FC<ChatViewProps> = ({ messages, onSendMessage, isLoading 
           </div>
         </div>
       )}
-      
-      <MessageInput onSendMessage={onSendMessage} disabled={isLoading} />
+
+
+      <MessageInput
+        onSendMessage={onSendMessage}
+        disabled={isLoading}
+        onError={onError}
+      />
     </div>
   );
 };
